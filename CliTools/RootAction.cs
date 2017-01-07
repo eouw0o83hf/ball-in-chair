@@ -16,7 +16,7 @@ namespace BallInChair.CliTools
 
         public void Execute()
         {
-            var buffer = new StringBuilder();
+            var inputState = new InputState();
             
             while(true)
             {
@@ -25,34 +25,65 @@ namespace BallInChair.CliTools
                 switch(input.Key)
                 {
                     case ConsoleKey.Tab:
-                        var filteredActions = GetAction(buffer.ToString())
-                                                .ToList();
+                        if(input.Modifiers.HasFlag(ConsoleModifiers.Shift))
+                        {
+                            inputState.TabIndex = (inputState.TabIndex ?? 0) - 1;
+                        }
+                        else
+                        {
+                            if(inputState.TabIndex.HasValue)
+                            {
+                                ++inputState.TabIndex;
+                            }
+                            else
+                            {
+                                inputState.TabIndex = 0;
+                            }
+                        }
+
+                        var filteredActions = GetAction(inputState.Buffer).ToList();
+                        // Account for possible negative tab index values and
+                        // lop off any excess
+                        inputState.TabIndex = (inputState.TabIndex + filteredActions.Count) % filteredActions.Count;
 
                         if(filteredActions.Any())
                         {
-                            var currentAction = filteredActions.First();                            
-                            Console.Write(currentAction.CommandName.Substring(buffer.ToString().Length));
+                            var currentAction = filteredActions[inputState.TabIndex.Value];
+                            ClearCurrentConsoleLine();
+                            Console.Write(currentAction.CommandName);
+                            inputState.TabCompletedBuffer = currentAction.CommandName;
                         }
-
                         break;
 
                     case ConsoleKey.Enter:
-                        var selectedAction = GetAction(buffer.ToString()).FirstOrDefault();
+                        // We need a newline regardless of what the next action is
+                        Console.WriteLine();
+
+                        var selectedAction = GetAction(inputState.Buffer).FirstOrDefault();
                         if(selectedAction != null)
                         {
-                            Console.WriteLine();
-                            buffer = new StringBuilder();
                             selectedAction.Execute();
                         }
+                        else
+                        {
+                            Console.WriteLine("No action with that name recognized, try again or ask for `help`");
+                        }
+
+                        inputState = new InputState();
                         break;
 
                     case ConsoleKey.Escape:
-                        buffer = new StringBuilder();
+                        inputState = new InputState();
                         ClearCurrentConsoleLine();
                         break;
 
+                    case ConsoleKey.Backspace:
+                        Console.Write("\b \b");
+                        inputState.Backspace();
+                        break;
+
                     default:
-                        buffer.Append(input.KeyChar);
+                        inputState.Append(input.KeyChar);
                         Console.Write(input.KeyChar);
                         break;
                 }
@@ -72,6 +103,39 @@ namespace BallInChair.CliTools
             Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth)); 
             Console.SetCursorPosition(0, currentLineCursor);
+        }
+
+        private class InputState
+        {
+            private readonly StringBuilder _buffer = new StringBuilder();
+
+            public void Append(string appendix)
+            {
+                _buffer.Append(appendix);
+                TabIndex = null;
+            }
+
+            public void Append(char appendix)
+            {
+                _buffer.Append(appendix);
+                TabIndex = null;
+            }
+
+            public void Backspace()
+            {
+                if(TabCompletedBuffer != null 
+                    && _buffer.Length < TabCompletedBuffer.Length)
+                {
+                    _buffer.Clear().Append(TabCompletedBuffer);
+                    TabCompletedBuffer = null;
+                }
+                _buffer.Remove(_buffer.Length - 1, 1);
+                TabIndex = null;
+            }
+
+            public string TabCompletedBuffer { get; set; }
+            public string Buffer => _buffer.ToString();
+            public int? TabIndex { get; set; }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 using BallInChair.CliTools;
+using BallInChair.CliTools.Players;
 
 namespace BallInChair
 {
@@ -12,7 +13,10 @@ namespace BallInChair
 
             var autocompleteActions = new IAutocompletingCliAction[]
             {
-                new HelpAction()
+                new HelpAction(),
+                new AddPlayerAction(),
+                new RenamePlayerAction(),
+                new DeletePlayerAction()
             };
 
             var root = new RootAction(autocompleteActions);
