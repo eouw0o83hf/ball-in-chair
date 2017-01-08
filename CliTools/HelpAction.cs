@@ -12,10 +12,5 @@ namespace BallInChair.CliTools
         {
             Console.WriteLine("Help content");
         }
-
-        public IEnumerable<string> GetDataOptions(string stub)
-        {
-            return Enumerable.Empty<string>();
-        }
     }
 }

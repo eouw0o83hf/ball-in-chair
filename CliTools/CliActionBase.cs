@@ -11,7 +11,5 @@ namespace BallInChair.CliTools
     public interface IAutocompletingCliAction : ICliAction
     {
         string CommandName { get; }
-
-        IEnumerable<string> GetDataOptions(string stub);
     }    
 }

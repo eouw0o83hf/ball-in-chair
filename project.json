@@ -4,7 +4,9 @@
     "debugType": "portable",
     "emitEntryPoint": true
   },
-  "dependencies": {},
+  "dependencies": {
+    "NodaTime": "2.0.0-alpha20160729"
+  },
   "frameworks": {
     "netcoreapp1.0": {
       "dependencies": {

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BallInChair.Persistence;
 
 namespace BallInChair.CliTools.Players
 {
@@ -8,14 +9,23 @@ namespace BallInChair.CliTools.Players
     {
         public string CommandName => "player add";
 
-        public void Execute()
+        private readonly IPlayerService _playerService;
+
+        public AddPlayerAction(IPlayerService playerService)
         {
-            Console.WriteLine("Adding a player");
+            _playerService = playerService;
         }
 
-        public IEnumerable<string> GetDataOptions(string stub)
+        public void Execute()
         {
-            return Enumerable.Empty<string>();
+            Console.WriteLine("Add a player");
+            Console.WriteLine("What is this player's name?");
+            
+            var name = Console.ReadLine();
+            var newId = Guid.NewGuid();
+            _playerService.CreatePlayer(newId, name);
+
+            Console.WriteLine($"Successfully added [{name}] as Player ID [{newId}]");
         }
     }
 }

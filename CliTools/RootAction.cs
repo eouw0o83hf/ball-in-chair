@@ -41,17 +41,12 @@ namespace BallInChair.CliTools
                             }
                         }
 
-                        var filteredActions = GetAction(inputState.Buffer).ToList();
-                        // Account for possible negative tab index values and
-                        // lop off any excess
-                        inputState.TabIndex = (inputState.TabIndex + filteredActions.Count) % filteredActions.Count;
-
-                        if(filteredActions.Any())
+                        var action = GetAction(inputState);
+                        if(action != null)
                         {
-                            var currentAction = filteredActions[inputState.TabIndex.Value];
                             ClearCurrentConsoleLine();
-                            Console.Write(currentAction.CommandName);
-                            inputState.TabCompletedBuffer = currentAction.CommandName;
+                            Console.Write(action.CommandName);
+                            inputState.TabCompletedBuffer = action.CommandName;
                         }
                         break;
 
@@ -59,7 +54,7 @@ namespace BallInChair.CliTools
                         // We need a newline regardless of what the next action is
                         Console.WriteLine();
 
-                        var selectedAction = GetAction(inputState.Buffer).FirstOrDefault();
+                        var selectedAction = GetAction(inputState);
                         if(selectedAction != null)
                         {
                             selectedAction.Execute();
@@ -90,11 +85,21 @@ namespace BallInChair.CliTools
             }
         }
 
-        private IEnumerable<IAutocompletingCliAction> GetAction(string cliInput)
+        private IAutocompletingCliAction GetAction(InputState inputState)
         {
-            return _actions
-                .Where(a => a.CommandName.StartsWith(cliInput, StringComparison.OrdinalIgnoreCase))
-                .OrderBy(a => a.CommandName);
+            var actions =  _actions
+                            .Where(a => a.CommandName.StartsWith(inputState.Buffer, StringComparison.OrdinalIgnoreCase))
+                            .OrderBy(a => a.CommandName)
+                            .ToList();
+
+            if(actions.Any())
+            {
+                // Account for possible negative tab index values and lop off any excess
+                inputState.TabIndex = (inputState.TabIndex + actions.Count) % actions.Count;
+                return actions[inputState.TabIndex.Value];
+            }
+
+            return null;
         }
 
         private static void ClearCurrentConsoleLine()

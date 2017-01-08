@@ -12,10 +12,5 @@ namespace BallInChair.CliTools.Players
         {
             Console.WriteLine("Renaming a player");
         }
-
-        public IEnumerable<string> GetDataOptions(string stub)
-        {
-            return Enumerable.Empty<string>();
-        }
     }
 }
