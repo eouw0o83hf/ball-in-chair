@@ -7,7 +7,7 @@ namespace BallInChair.CliTools.Framework
 {
     public interface ITabCompletionProvider
     {
-        ITabCompletableResponseItem DoTabCompletion();
+        void DoTabCompletion();
     }
 
     public class TabCompletionProvider : ITabCompletionProvider
@@ -19,9 +19,10 @@ namespace BallInChair.CliTools.Framework
             _container = container;
         }
 
-        public ITabCompletableResponseItem DoTabCompletion()
+        public void DoTabCompletion()
         {
             var inputState = new InputState();
+            Console.Write('>');
             
             while(true)
             {
@@ -62,7 +63,8 @@ namespace BallInChair.CliTools.Framework
                         var selectedAction = GetAction(inputState);
                         if(selectedAction != null)
                         {
-                            return selectedAction;
+                            selectedAction.Execute();
+                            return;
                         }
                         else
                         {
@@ -112,6 +114,7 @@ namespace BallInChair.CliTools.Framework
             Console.SetCursorPosition(0, Console.CursorTop);
             Console.Write(new string(' ', Console.WindowWidth)); 
             Console.SetCursorPosition(0, currentLineCursor);
+            Console.Write('>');
         }
 
         private class InputState

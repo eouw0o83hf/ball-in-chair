@@ -13,6 +13,6 @@ namespace BallInChair.CliTools.Framework
     public interface ITabCompletableResponseItem
     {
         string FullText { get; }
-        void Execute(string input);
+        void Execute();
     }
 }

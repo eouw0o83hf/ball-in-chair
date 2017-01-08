@@ -19,8 +19,7 @@ namespace BallInChair.CliTools
         {
             while(true)
             {
-                var nextAction = _actionCompletionProvider.DoTabCompletion();
-                nextAction.Execute(nextAction.FullText);
+                _actionCompletionProvider.DoTabCompletion();
             }
         }        
     }

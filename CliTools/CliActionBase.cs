@@ -10,7 +10,6 @@ namespace BallInChair.CliTools
         public abstract string CommandName { get; }
         public abstract void Execute();
 
-        void ITabCompletableResponseItem.Execute(string input) => Execute();
         string ITabCompletableResponseItem.FullText => CommandName;
     }
 
