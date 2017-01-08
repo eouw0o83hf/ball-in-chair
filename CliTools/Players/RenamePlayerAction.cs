@@ -4,11 +4,11 @@ using System.Linq;
 
 namespace BallInChair.CliTools.Players
 {
-    public class RenamePlayerAction : IAutocompletingCliAction
+    public class RenamePlayerAction : CliActionBase
     {
-        public string CommandName => "player rename";
+        public override string CommandName => "player rename";
 
-        public void Execute()
+        public override void Execute()
         {
             Console.WriteLine("Renaming a player");
         }

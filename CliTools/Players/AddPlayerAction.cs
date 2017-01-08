@@ -5,9 +5,9 @@ using BallInChair.Persistence;
 
 namespace BallInChair.CliTools.Players
 {
-    public class AddPlayerAction : IAutocompletingCliAction
+    public class AddPlayerAction : CliActionBase
     {
-        public string CommandName => "player add";
+        public override string CommandName => "player add";
 
         private readonly IPlayerService _playerService;
 
@@ -16,7 +16,7 @@ namespace BallInChair.CliTools.Players
             _playerService = playerService;
         }
 
-        public void Execute()
+        public override void Execute()
         {
             Console.WriteLine("Add a player");
             Console.WriteLine("What is this player's name?");

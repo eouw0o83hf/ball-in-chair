@@ -1,15 +1,31 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using BallInChair.CliTools.Framework;
 
 namespace BallInChair.CliTools
 {
-    public interface ICliAction
+    public abstract class CliActionBase : ITabCompletableResponseItem
     {
-        void Execute();
+        public abstract string CommandName { get; }
+        public abstract void Execute();
+
+        void ITabCompletableResponseItem.Execute(string input) => Execute();
+        string ITabCompletableResponseItem.FullText => CommandName;
     }
 
-    public interface IAutocompletingCliAction : ICliAction
+    public class AutoCompletingCliActionsContainer : ITabCompletableQueryContainer
     {
-        string CommandName { get; }
-    }    
+        private readonly ICollection<CliActionBase> _actions;
+
+        public AutoCompletingCliActionsContainer(ICollection<CliActionBase> actions)
+        {
+            _actions = actions;
+        }
+        
+        public IEnumerable<ITabCompletableResponseItem> GetMatches(string input)
+        {
+            return _actions.Where(a => a.CommandName.StartsWith(input, StringComparison.OrdinalIgnoreCase));
+        }
+    }
 }

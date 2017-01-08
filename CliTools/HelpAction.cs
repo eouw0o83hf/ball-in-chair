@@ -4,13 +4,23 @@ using System.Linq;
 
 namespace BallInChair.CliTools
 {
-    public class HelpAction : IAutocompletingCliAction
+    public class HelpAction : CliActionBase
     {
-        public string CommandName => "help";
+        public override string CommandName => "help";
+        private readonly ICollection<CliActionBase> _actions;
 
-        public void Execute()
+        public HelpAction(ICollection<CliActionBase> actions)
         {
-            Console.WriteLine("Help content");
+            _actions = actions;
+        }
+
+        public override void Execute()
+        {
+            Console.WriteLine("Actions:");
+            foreach(var action in _actions)
+            {
+                Console.WriteLine($"\t{action.CommandName}");
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Text;
+using System.Collections.Generic;
 using BallInChair.CliTools;
+using BallInChair.CliTools.Framework;
 using BallInChair.CliTools.Players;
 using BallInChair.Persistence;
 
@@ -14,15 +15,20 @@ namespace BallInChair
 
             var playerService = new InMemoryPlayerService();
 
-            var autocompleteActions = new IAutocompletingCliAction[]
+            var autocompleteActions = new List<CliActionBase>
             {
-                new HelpAction(),
                 new AddPlayerAction(playerService),
                 new RenamePlayerAction(),
                 new ListPlayersAction(playerService)
             };
 
-            var root = new RootAction(autocompleteActions);
+            var helpAction = new HelpAction(autocompleteActions);
+            autocompleteActions.Add(helpAction);
+
+            var rootCompletionContainer = new AutoCompletingCliActionsContainer(autocompleteActions);
+            var rootCompletionProvider = new TabCompletionProvider(rootCompletionContainer);
+
+            var root = new RootAction(rootCompletionProvider);
             root.Execute();
         }
     }

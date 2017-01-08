@@ -6,9 +6,9 @@ using BallInChair.Persistence;
 
 namespace BallInChair.CliTools.Players
 {
-    public class ListPlayersAction : IAutocompletingCliAction
+    public class ListPlayersAction : CliActionBase
     {
-        public string CommandName => "player list";
+        public override string CommandName => "player list";
         private const int ColumnPaddingSpaces = 4;
 
         private readonly IPlayerService _playerService;
@@ -18,9 +18,14 @@ namespace BallInChair.CliTools.Players
             _playerService = playerService;
         }
 
-        public void Execute()
+        public override void Execute()
         {
             var players = _playerService.GetAllPlayers();
+            if(!players.Any())
+            {
+                return;
+            }
+            
             var maxNameLength = players.Max(a => a.Name.Length);
 
             var builder = new StringBuilder();
