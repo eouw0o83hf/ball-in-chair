@@ -15,12 +15,15 @@ namespace BallInChair
 
             // Wire up dependencies
             var playerService = new InMemoryPlayerService();
+            var exit = new ExitContainer();
 
+            // Link Actions
             var autocompleteActions = new List<CliActionBase>
             {
                 new AddPlayerAction(playerService),
                 new RenamePlayerAction(playerService),
-                new ListPlayersAction(playerService)
+                new ListPlayersAction(playerService),
+                new ExitAction(exit)
             };
 
             var helpAction = new HelpAction(autocompleteActions);
@@ -33,7 +36,7 @@ namespace BallInChair
             InitializePlayers(playerService);
 
             // Run it
-            var root = new RootAction(rootCompletionProvider);
+            var root = new RootAction(rootCompletionProvider, exit);
             root.Execute();
         }
 
