@@ -21,7 +21,7 @@ namespace BallInChair.CliTools.Rounds
             var existingRound = _roundService.GetOpenRoundId();
             if(existingRound.HasValue)
             {
-                Console.WriteLine("There's already an open round, you donkey-brain!");
+                ConsoleHelpers.WriteRedLine("There's already an open round, you donkey-brain!");
                 return;
             }
 
@@ -29,7 +29,7 @@ namespace BallInChair.CliTools.Rounds
             _roundService.OpenNewRound(roundId);
             var round = _roundService.GetRound(roundId);
             
-            Console.WriteLine($"Opened Round {round.RoundNumber}");
+            ConsoleHelpers.WriteGreenLine($"Opened Round {round.RoundNumber}");
         }
     }
 }

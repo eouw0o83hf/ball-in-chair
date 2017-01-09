@@ -68,7 +68,7 @@ namespace BallInChair.CliTools.Framework
                         }
                         else
                         {
-                            Console.WriteLine("No action with that name recognized, try again or ask for `help`");
+                            ConsoleHelpers.WriteRedLine("No action with that name recognized, try again or ask for `help`");
                         }
 
                         inputState = new InputState();
@@ -101,8 +101,11 @@ namespace BallInChair.CliTools.Framework
             if(actions.Any())
             {
                 // Account for possible negative tab index values and lop off any excess
-                inputState.TabIndex = (inputState.TabIndex + actions.Count) % actions.Count;
-                return actions[inputState.TabIndex.Value];
+                if(inputState.TabIndex.HasValue)
+                {
+                    inputState.TabIndex = (inputState.TabIndex + actions.Count) % actions.Count;
+                }
+                return actions[inputState.TabIndex ?? 0];
             }
 
             return null;

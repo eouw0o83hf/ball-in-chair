@@ -2,48 +2,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BallInChair.CliTools.Framework;
+using BallInChair.CliTools.Players;
 using BallInChair.Persistence;
 
 namespace BallInChair.CliTools.Rounds
 {
-    public class WinRoundAction : CliActionBase
+    public class WinRoundAction : SearchPlayerActionBase
     {
-        public override string CommandName => "round declare winner";
-
-        private readonly IPlayerService _playerService;
         private readonly IRoundService _roundService;
-        private readonly ITabCompletableQueryContainer _playerCompletionContainer;
-        private readonly ITabCompletionProvider _playerCompletionProvider;
 
         public WinRoundAction(IPlayerService playerService, IRoundService roundService)
+            : base(playerService)
         {
-            _playerService = playerService;
             _roundService = roundService;
-            _playerCompletionContainer = new PlayerNameQueryContainer(playerService, ExecuteCore);
-            _playerCompletionProvider = new TabCompletionProvider(_playerCompletionContainer);
-        }
-        
-        public override void Execute()
-        {
-            Console.WriteLine("Who won?");
-            _playerCompletionProvider.DoTabCompletion();
         }
 
-        private void ExecuteCore(Guid playerId)
+        public override string CommandName => "round declare winner";
+        protected override string PreInputMessage => "Who won?";
+
+        protected override void ExecuteCore(Guid playerId)
         {
             var roundId = _roundService.GetOpenRoundId();
             if(roundId == null)
             {
-                Console.WriteLine("No Round is currently open - open a new Round first.");
+                ConsoleHelpers.WriteRedLine("No Round is currently open - open a new Round first.");
+                return;
             }
 
             var round = _roundService.GetRound(roundId.Value);
             if(!round.EntrantPlayerIds.Contains(playerId))
             {
-                Console.WriteLine("That player didn't enter this Round! Try again.");
+                ConsoleHelpers.WriteRedLine("That player didn't enter this Round! Try again.");
+                return;
             }
 
+            var player = PlayerService.GetPlayer(playerId);
+
             _roundService.DeclareWinner(roundId.Value, playerId);
+            ConsoleHelpers.WriteGreenLine($"{player.Name} won {round.EntrantPlayerIds.Count} credits to end Round {round.RoundNumber}");
         }
     }
 }

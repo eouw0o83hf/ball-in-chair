@@ -6,30 +6,18 @@ using BallInChair.Persistence;
 
 namespace BallInChair.CliTools.Players
 {
-    public class RenamePlayerAction : CliActionBase
+    public class RenamePlayerAction : SearchPlayerActionBase
     {
+        public RenamePlayerAction(IPlayerService playerService)
+            : base(playerService) { }
+
         public override string CommandName => "player rename";
 
-        private readonly IPlayerService _playerService;
-        private readonly ITabCompletableQueryContainer _playerCompletionContainer;
-        private readonly ITabCompletionProvider _playerCompletionProvider;
+        protected override string PreInputMessage => "Renaming a player: who should we rename?";
 
-        public RenamePlayerAction(IPlayerService playerService)
+        protected override void ExecuteCore(Guid playerId)
         {
-            _playerService = playerService;
-            _playerCompletionContainer = new PlayerNameQueryContainer(playerService, Rename);
-            _playerCompletionProvider = new TabCompletionProvider(_playerCompletionContainer);
-        }
-
-        public override void Execute()
-        {
-            Console.WriteLine("Renaming a player: who should we rename?");
-            _playerCompletionProvider.DoTabCompletion();
-        }
-
-        private void Rename(Guid playerId)
-        {
-            var player = _playerService.GetPlayer(playerId);
+            var player = PlayerService.GetPlayer(playerId);
 
             Console.WriteLine($"What should we rename `{player.Name}` to?");
 
@@ -37,10 +25,11 @@ namespace BallInChair.CliTools.Players
             if(string.IsNullOrEmpty(newName))
             {
                 Console.WriteLine("Canceled renaming");
+                return;
             }
 
-            _playerService.UpdatePlayerName(playerId, newName.Trim());
-            Console.WriteLine($"Successfully renamed `{player.Name}` to `{newName}`");
+            PlayerService.UpdatePlayerName(playerId, newName.Trim());
+            ConsoleHelpers.WriteGreenLine($"Successfully renamed `{player.Name}` to `{newName}`");
         }
     }
 }

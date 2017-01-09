@@ -25,7 +25,7 @@ namespace BallInChair.CliTools.Players
             var newId = Guid.NewGuid();
             _playerService.CreatePlayer(newId, name);
 
-            Console.WriteLine($"Successfully added [{name}] as Player ID [{newId}]");
+            ConsoleHelpers.WriteGreenLine($"Successfully added [{name}] as Player ID [{newId}]");
         }
     }
 }

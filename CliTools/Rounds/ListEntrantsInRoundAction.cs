@@ -24,7 +24,7 @@ namespace BallInChair.CliTools.Rounds
             var roundId = _roundService.GetOpenRoundId();
             if(roundId == null)
             {
-                Console.WriteLine("No round is open.");
+                ConsoleHelpers.WriteRedLine("No round is open.");
             }
 
             var round = _roundService.GetRound(roundId.Value);
@@ -43,6 +43,9 @@ namespace BallInChair.CliTools.Rounds
                 var player = _playerService.GetPlayer(playerId);
                 Console.WriteLine(player.Name);
             }
+
+            Console.WriteLine("----------------------------------");
+            ConsoleHelpers.WriteGreenLine($"{round.EntrantPlayerIds.Count} total entrants Round {round.RoundNumber}");
         }
     }
 }

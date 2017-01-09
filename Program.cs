@@ -25,6 +25,8 @@ namespace BallInChair
             var autocompleteActions = new List<CliActionBase>
             {
                 new AddPlayerAction(playerService),
+                new CreditPlayerAction(playerService, ledgerService),
+                new ViewPlayerAction(playerService),
                 new RenamePlayerAction(playerService),
                 new ListPlayersAction(playerService),
                 new ExitAction(exit),
@@ -42,6 +44,7 @@ namespace BallInChair
 
             // Populate initial/test data
             InitializePlayers(playerService);
+            InitializeLedger(playerService, ledgerService);
 
             // Run it
             var root = new RootAction(rootCompletionProvider, exit);
@@ -56,10 +59,18 @@ namespace BallInChair
             playerService.CreatePlayer(Guid.NewGuid(), "Chris Maffin");
             playerService.CreatePlayer(Guid.NewGuid(), "Sam Nissim");
             playerService.CreatePlayer(Guid.NewGuid(), "Andrew MacGill");
-            playerService.CreatePlayer(Guid.NewGuid(), "Alfred Mwagari");
+            playerService.CreatePlayer(Guid.NewGuid(), "Alfred Mwangi");
             playerService.CreatePlayer(Guid.NewGuid(), "Scott Gould");
             playerService.CreatePlayer(Guid.NewGuid(), "Chris Brown");
             playerService.CreatePlayer(Guid.NewGuid(), "Katy Brown");
+        }
+
+        private static void InitializeLedger(IPlayerService playerService, ILedgerService ledgerService)
+        {
+            foreach(var player in playerService.GetAllPlayers())
+            {
+                ledgerService.PurchaseCredits(player.Id, 3);
+            }
         }
     }
 }
