@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using BallInChair.CliTools;
 using BallInChair.CliTools.Framework;
 using BallInChair.CliTools.Players;
+using BallInChair.CliTools.Rounds;
 using BallInChair.Persistence;
+using NodaTime;
 
 namespace BallInChair
 {
@@ -14,16 +16,22 @@ namespace BallInChair
             Console.WriteLine("Welcome to Ball on Chair!");
 
             // Wire up dependencies
-            var playerService = new InMemoryPlayerService();
-            var exit = new ExitContainer();
+            var ledgerService = new InMemoryLedgerService(SystemClock.Instance);
+            var playerService = new InMemoryPlayerService(ledgerService);
+            var roundService = new InMemoryRoundService(playerService, ledgerService, SystemClock.Instance);            
 
             // Link Actions
+            var exit = new ExitContainer();
             var autocompleteActions = new List<CliActionBase>
             {
                 new AddPlayerAction(playerService),
                 new RenamePlayerAction(playerService),
                 new ListPlayersAction(playerService),
-                new ExitAction(exit)
+                new ExitAction(exit),
+                new StartRoundAction(roundService),
+                new AddPlayerToRoundAction(playerService, roundService),
+                new ListEntrantsRoundAction(roundService, playerService),
+                new WinRoundAction(playerService, roundService)
             };
 
             var helpAction = new HelpAction(autocompleteActions);

@@ -8,6 +8,7 @@ namespace BallInChair.Models
     {
         public Guid Id { get; set; }
         public int RoundNumber { get; set; }
+        public bool IsOpen { get; set; }
         public LocalDate Date { get; set; }
 
         public List<Guid> EntrantPlayerIds { get; set; }
