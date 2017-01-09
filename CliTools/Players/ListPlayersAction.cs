@@ -12,10 +12,12 @@ namespace BallInChair.CliTools.Players
         private const int ColumnPaddingSpaces = 4;
 
         private readonly IPlayerService _playerService;
+        private readonly ILedgerService _ledgerService;
 
-        public ListPlayersAction(IPlayerService playerService)
+        public ListPlayersAction(IPlayerService playerService, ILedgerService ledgerService)
         {
             _playerService = playerService;
+            _ledgerService = ledgerService;
         }
 
         public override void Execute()
@@ -38,9 +40,11 @@ namespace BallInChair.CliTools.Players
 
             foreach(var p in players)
             {
+                var balance = _ledgerService.GetBalance(p.Id);
+
                 builder.Append(p.Name).Append(' ', maxNameLength - p.Name.Length);
                 builder.Append(' ', ColumnPaddingSpaces);
-                builder.Append(p.Balance);
+                builder.Append(balance);
                 builder.AppendLine();
             }
 

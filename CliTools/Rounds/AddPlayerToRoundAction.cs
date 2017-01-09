@@ -10,11 +10,13 @@ namespace BallInChair.CliTools.Rounds
     public class AddPlayerToRoundAction : SearchPlayerActionBase
     {
         private readonly IRoundService _roundService;
+        private readonly ILedgerService _ledgerService;
 
-        public AddPlayerToRoundAction(IPlayerService playerService, IRoundService roundService)
+        public AddPlayerToRoundAction(IPlayerService playerService, IRoundService roundService, ILedgerService ledgerService)
             : base(playerService)
         {
             _roundService = roundService;
+            _ledgerService = ledgerService;
         }
 
         public override string CommandName => "round make election";
@@ -23,7 +25,9 @@ namespace BallInChair.CliTools.Rounds
         protected override void ExecuteCore(Guid playerId)
         {
             var player = PlayerService.GetPlayer(playerId);
-            if(player.Balance <= 0)
+            var balance = _ledgerService.GetBalance(playerId);
+            
+            if(balance <= 0)
             {
                 ConsoleHelpers.WriteRedLine($"{player.Name} does not have enough credits to elect.");
                 return;

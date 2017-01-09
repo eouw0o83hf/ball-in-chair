@@ -58,7 +58,8 @@ namespace BallInChair.Persistence
                 throw new ArgumentException("No player of that ID found", nameof(playerId));
             }
 
-            if(player.Balance <= 0)
+            var balance = _ledgerService.GetBalance(playerId);
+            if(balance <= 0)
             {
                 throw new InvalidOperationException("Player doesn't have any elections available");
             }

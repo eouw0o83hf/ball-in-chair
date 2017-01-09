@@ -8,8 +8,13 @@ namespace BallInChair.CliTools.Players
 {
     public class ViewPlayerAction : SearchPlayerActionBase
     {
-        public ViewPlayerAction(IPlayerService playerService)
-            : base(playerService) { }
+        private readonly ILedgerService _ledgerService;
+        
+        public ViewPlayerAction(IPlayerService playerService, ILedgerService ledgerService)
+            : base(playerService) 
+        { 
+            _ledgerService = ledgerService;
+        }
 
         public override string CommandName => "player view";
         protected override string PreInputMessage => "Who are you looking for?";
@@ -17,8 +22,9 @@ namespace BallInChair.CliTools.Players
         protected override void ExecuteCore(Guid playerId)
         {
             var player = PlayerService.GetPlayer(playerId);
-            var creditPlural = player.Balance != 1 ? "s" : string.Empty;
-            Console.WriteLine($"{player.Name} currently has {player.Balance} credit{creditPlural}.");
+            var balance = _ledgerService.GetBalance(playerId);
+            var creditPlural = balance != 1 ? "s" : string.Empty;
+            Console.WriteLine($"{player.Name} currently has {balance} credit{creditPlural}.");
         }
     }
 }
