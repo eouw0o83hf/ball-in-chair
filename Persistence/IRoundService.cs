@@ -18,15 +18,16 @@ namespace BallInChair.Persistence
         void DeclareWinner(Guid roundId, Guid playerId);
     }
 
-    public class InMemoryRoundService : IRoundService
+    public class JsonBackedRoundService : JsonBackedServiceBase<RoundModel>, IRoundService
     {
-        private static readonly ICollection<RoundModel> Rounds = new List<RoundModel>();
+        private const string RoundsJsonFile = "rounds.json";
         
         private readonly IPlayerService _playerService;
         private readonly ILedgerService _ledgerService;
         private readonly IClock _clock;
         
-        public InMemoryRoundService(IPlayerService playerService, ILedgerService ledgerService, IClock clock)
+        public JsonBackedRoundService(IPlayerService playerService, ILedgerService ledgerService, IClock clock, string directory)
+            : base(directory, RoundsJsonFile)
         {
             _playerService = playerService;
             _ledgerService = ledgerService;
@@ -37,17 +38,21 @@ namespace BallInChair.Persistence
         {
             var entities = ValidateIds(roundId, playerId);
 
-            _ledgerService.MakeElection(playerId);
-            entities.Item1.EntrantPlayerIds.Add(playerId);
+            _ledgerService.MakeElection(playerId, roundId);
+
+            entities.Item1.EntrantPlayerIds.Add(playerId);            
+            UpdateEntity(entities.Item1, a => a.Id == roundId);
         }
 
         public void DeclareWinner(Guid roundId, Guid playerId)
         {
             var entities = ValidateIds(roundId, playerId);
 
+            _ledgerService.AwardWinnings(playerId, entities.Item1.EntrantPlayerIds.Count);
+
             entities.Item1.WinningPlayerId = playerId;
             entities.Item1.IsOpen = false;
-            _ledgerService.AwardWinnings(playerId, entities.Item1.EntrantPlayerIds.Count);
+            UpdateEntity(entities.Item1, a => a.Id == roundId);
         }
 
         private Tuple<RoundModel, PlayerModel> ValidateIds(Guid roundId, Guid playerId)
@@ -75,12 +80,12 @@ namespace BallInChair.Persistence
 
         public ICollection<RoundModel> GetAllRounds()
         {
-            return Rounds.ToList();
+            return GetPersistedData().ToList();
         }
 
         public Guid? GetOpenRoundId()
         {
-            return Rounds
+            return GetPersistedData()
                     .Where(a => a.IsOpen)
                     .Select(a => a.Id)
                     .Cast<Guid?>()
@@ -89,20 +94,21 @@ namespace BallInChair.Persistence
 
         public RoundModel GetRound(Guid roundId)
         {
-            return Rounds.FirstOrDefault(a => a.Id == roundId);
+            return GetPersistedData().FirstOrDefault(a => a.Id == roundId);
         }
 
         public void OpenNewRound(Guid roundId)
         {
-            if(Rounds.Any(a => a.Id == roundId))
+            var rounds = GetAllRounds();
+            if(rounds.Any(a => a.Id == roundId))
             {
                 throw new ArgumentException("That ID already exists", nameof(roundId));
             }
 
-            Rounds.Add(new RoundModel
+            SaveNewEntity(new RoundModel
             {
                 Id = roundId,
-                RoundNumber = Rounds.Any() ? Rounds.Max(a => a.RoundNumber) + 1 : 1,
+                RoundNumber = rounds.Any() ? rounds.Max(a => a.RoundNumber) + 1 : 1,
                 IsOpen = true,
                 Date = _clock.GetCurrentInstant().InZone(DateTimeZone.ForOffset(Offset.FromHours(-7))).Date,
                 EntrantPlayerIds = new List<Guid>(),

@@ -4,16 +4,24 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json.Serialization;
+using NodaTime;
+using NodaTime.Serialization.JsonNet;
 
 namespace BallInChair.Persistence
 {
     public abstract class JsonBackedServiceBase<TModel>
     {
-        private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings
+        private static readonly JsonSerializerSettings JsonSerializerSettings;
+        
+        static JsonBackedServiceBase()
+        { 
+            JsonSerializerSettings = new JsonSerializerSettings
             {
                 Formatting = Formatting.Indented,
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
+            JsonSerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        }
         
         private readonly string _persistenceFile;
 

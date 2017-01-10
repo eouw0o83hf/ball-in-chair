@@ -16,44 +16,6 @@ namespace BallInChair.Persistence
         void UpdatePlayerName(Guid id, string name);
     }
 
-    public class InMemoryPlayerService : IPlayerService
-    {
-        private static readonly ICollection<PlayerModel> Players = new List<PlayerModel>();
-        
-        public void CreatePlayer(Guid id, string name)
-        {
-            if(Players.Any(a => a.Id == id))
-            {
-                throw new Exception("Player with that ID already exists");
-            }
-            
-            Players.Add(new PlayerModel
-            {
-               Id = id,
-               Name = name 
-            });
-        }
-
-        public ICollection<PlayerModel> GetAllPlayers()
-        {
-            return Players
-                    .Select(a => GetPlayer(a.Id))
-                    .ToList();
-        }
-
-        public PlayerModel GetPlayer(Guid id)
-        {
-            var player = Players.FirstOrDefault(a => a.Id == id);
-            return player;
-        }
-
-        public void UpdatePlayerName(Guid id, string name)
-        {
-            var player = GetPlayer(id);
-            player.Name = name;
-        }
-    }
-
     public class JsonBackedPlayerService : JsonBackedServiceBase<PlayerModel>, IPlayerService
     {       
         private const string PlayerJsonFile = "players.json";

@@ -8,7 +8,7 @@ namespace BallInChair.Persistence
 {
     public interface ILedgerService
     {
-        void MakeElection(Guid playerId);
+        void MakeElection(Guid playerId, Guid roundId);
         void PurchaseCredits(Guid playerId, int creditCount);
         void AwardWinnings(Guid playerId, int winningAmount);
 
@@ -16,44 +16,47 @@ namespace BallInChair.Persistence
         ICollection<LedgerEntry> GetPlayerHistory(Guid playerId);
     }
 
-    public class InMemoryLedgerService : ILedgerService
+    public class JsonBackedLedgerService : JsonBackedServiceBase<LedgerEntry>, ILedgerService
     {
-        private static readonly ICollection<LedgerEntry> Ledger = new List<LedgerEntry>();
+        private const string LedgerJsonFile = "ledger.json";
 
         private readonly IClock _clock;
 
-        public InMemoryLedgerService(IClock clock)
-        {
+        public JsonBackedLedgerService(IClock clock, string directory) 
+            : base(directory, LedgerJsonFile) 
+        { 
             _clock = clock;
         }
 
-        public void MakeElection(Guid playerId) => AddEntry(playerId, -1, LedgerType.Election);
+        public void MakeElection(Guid playerId, Guid roundId) => AddEntry(playerId, -1, LedgerType.Election, roundId);
         public void PurchaseCredits(Guid playerId, int creditCount) => AddEntry(playerId, creditCount, LedgerType.CreditPurchase);
         public void AwardWinnings(Guid playerId, int winningAmount) => AddEntry(playerId, winningAmount, LedgerType.Winning);
 
-        private void AddEntry(Guid playerId, int amount, LedgerType type)
+        private void AddEntry(Guid playerId, int amount, LedgerType type, Guid? roundid = null)
         {
-            Ledger.Add(new LedgerEntry
+            SaveNewEntity(new LedgerEntry
             {
                 Id = Guid.NewGuid(),
                 PlayerId = playerId,
                 Amount = amount,
                 Type = type,
-                TransactionTime = _clock.GetCurrentInstant()
+                TransactionTime = _clock.GetCurrentInstant(),
+                RoundId = roundid
             });
         }
 
         public int GetBalance(Guid playerId)
         {
-            return Ledger
+            return GetPersistedData()
                     .Where(a => a.PlayerId == playerId)
                     .Sum(a => a.Amount);
         }
 
         public ICollection<LedgerEntry> GetPlayerHistory(Guid playerId)
         {
-            return Ledger
+            return GetPersistedData()
                     .Where(a => a.PlayerId == playerId)
+                    .OrderBy(a => a.TransactionTime)
                     .ToList();
         }
     }

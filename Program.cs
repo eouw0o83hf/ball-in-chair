@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using BallInChair.CliTools;
 using BallInChair.CliTools.Framework;
 using BallInChair.CliTools.Players;
@@ -20,9 +21,9 @@ namespace BallInChair
             Console.WriteLine("Welcome to Ball on Chair!");
 
             // Wire up dependencies
-            var ledgerService = new InMemoryLedgerService(SystemClock.Instance);
+            var ledgerService = new JsonBackedLedgerService(SystemClock.Instance, PersistenceDirectory);
             var playerService = new JsonBackedPlayerService(PersistenceDirectory);
-            var roundService = new InMemoryRoundService(playerService, ledgerService, SystemClock.Instance);            
+            var roundService = new JsonBackedRoundService(playerService, ledgerService, SystemClock.Instance, PersistenceDirectory);            
 
             // Link Actions
             var exit = new ExitContainer();

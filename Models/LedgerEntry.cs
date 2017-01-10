@@ -9,6 +9,8 @@ namespace BallInChair.Models
 
         public Guid PlayerId { get; set; }
 
+        public Guid? RoundId { get; set; }
+
         public int Amount { get; set; }
 
         public LedgerType Type { get; set; }
