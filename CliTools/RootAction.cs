@@ -17,6 +17,7 @@ namespace BallInChair.CliTools
         {
             while(!_exit.TimeToLeaveTown)
             {
+                ConsoleHelpers.WriteMagentaLine("Let's play Ball in Chair! Enter a command.");
                 _actionCompletionProvider.DoTabCompletion();
             }
         }        

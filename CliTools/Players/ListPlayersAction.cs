@@ -38,7 +38,7 @@ namespace BallInChair.CliTools.Players
             builder.Append('-', builder.Length - 1);
             builder.AppendLine();
 
-            foreach(var p in players)
+            foreach(var p in players.OrderBy(a => a.Name))
             {
                 var balance = _ledgerService.GetBalance(p.Id);
 

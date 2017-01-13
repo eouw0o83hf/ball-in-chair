@@ -31,8 +31,10 @@ namespace BallInChair
             {
                 new AddPlayerAction(playerService),
                 new CreditPlayerAction(playerService, ledgerService),
-                new ViewPlayerAction(playerService, ledgerService),
+                new ViewPlayerAction(playerService, ledgerService, roundService),
                 new RenamePlayerAction(playerService),
+                new ListRoundsAction(roundService),
+                new ViewRoundAction(roundService, playerService),
                 new ListPlayersAction(playerService, ledgerService),
                 new ExitAction(exit),
                 new StartRoundAction(roundService),
@@ -47,42 +49,9 @@ namespace BallInChair
             var rootCompletionContainer = new AutoCompletingCliActionsContainer(autocompleteActions);
             var rootCompletionProvider = new TabCompletionProvider(rootCompletionContainer);
 
-            // Populate initial/test data
-            InitializePlayers(playerService);
-            InitializeLedger(playerService, ledgerService);
-
             // Run it
             var root = new RootAction(rootCompletionProvider, exit);
             root.Execute();
-        }
-
-        private static void InitializePlayers(IPlayerService playerService)
-        {
-            try
-            {
-                playerService.CreatePlayer(Guid.NewGuid(), "Nathan Landis");
-                playerService.CreatePlayer(Guid.NewGuid(), "Nathan Lande");
-                playerService.CreatePlayer(Guid.NewGuid(), "Mike Balling");
-                playerService.CreatePlayer(Guid.NewGuid(), "Chris Maffin");
-                playerService.CreatePlayer(Guid.NewGuid(), "Sam Nissim");
-                playerService.CreatePlayer(Guid.NewGuid(), "Andrew MacGill");
-                playerService.CreatePlayer(Guid.NewGuid(), "Alfred Mwangi");
-                playerService.CreatePlayer(Guid.NewGuid(), "Scott Gould");
-                playerService.CreatePlayer(Guid.NewGuid(), "Chris Brown");
-                playerService.CreatePlayer(Guid.NewGuid(), "Katy Brown");
-            }
-            catch
-            {
-                // For an initialized persistence file, this will error. Don't care.
-            }
-        }
-
-        private static void InitializeLedger(IPlayerService playerService, ILedgerService ledgerService)
-        {
-            foreach(var player in playerService.GetAllPlayers())
-            {
-                ledgerService.PurchaseCredits(player.Id, 3);
-            }
         }
     }
 }

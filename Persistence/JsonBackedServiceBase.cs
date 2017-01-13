@@ -6,6 +6,7 @@ using System.Linq;
 using Newtonsoft.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.JsonNet;
+using Newtonsoft.Json.Converters;
 
 namespace BallInChair.Persistence
 {
@@ -21,6 +22,7 @@ namespace BallInChair.Persistence
                 ContractResolver = new CamelCasePropertyNamesContractResolver()
             };
             JsonSerializerSettings.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+            JsonSerializerSettings.Converters.Add(new StringEnumConverter { CamelCaseText = true });
         }
         
         private readonly string _persistenceFile;

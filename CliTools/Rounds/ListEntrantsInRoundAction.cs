@@ -25,6 +25,7 @@ namespace BallInChair.CliTools.Rounds
             if(roundId == null)
             {
                 ConsoleHelpers.WriteRedLine("No round is open.");
+                return;
             }
 
             var round = _roundService.GetRound(roundId.Value);
