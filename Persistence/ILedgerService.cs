@@ -11,6 +11,7 @@ namespace BallInChair.Persistence
         void MakeElection(Guid playerId, Guid roundId);
         void PurchaseCredits(Guid playerId, int creditCount);
         void AwardWinnings(Guid playerId, int winningAmount);
+        void CashOut(Guid playerId, int cashOutAmount);
 
         int GetBalance(Guid playerId);
         ICollection<LedgerEntry> GetPlayerHistory(Guid playerId);
@@ -31,6 +32,14 @@ namespace BallInChair.Persistence
         public void MakeElection(Guid playerId, Guid roundId) => AddEntry(playerId, -1, LedgerType.Election, roundId);
         public void PurchaseCredits(Guid playerId, int creditCount) => AddEntry(playerId, creditCount, LedgerType.CreditPurchase);
         public void AwardWinnings(Guid playerId, int winningAmount) => AddEntry(playerId, winningAmount, LedgerType.Winning);
+        public void CashOut(Guid playerId, int cashOutAmount)
+        {
+            if(cashOutAmount > 0)
+            {
+                throw new Exception("Need to cash out a negative amount");
+            }
+            AddEntry(playerId, cashOutAmount, LedgerType.CashOut);
+        } 
 
         private void AddEntry(Guid playerId, int amount, LedgerType type, Guid? roundid = null)
         {
