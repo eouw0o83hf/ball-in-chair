@@ -15,6 +15,7 @@ namespace BallInChair.Persistence
         Guid? GetOpenRoundId();
 
         void AddElectionToRound(Guid roundId, Guid playerId);
+        void RemoveElectionFromRound(Guid roundId, Guid playerId);
         void DeclareWinner(Guid roundId, Guid playerId);
     }
 
@@ -41,6 +42,15 @@ namespace BallInChair.Persistence
             _ledgerService.MakeElection(playerId, roundId);
 
             entities.Item1.EntrantPlayerIds.Add(playerId);            
+            UpdateEntity(entities.Item1, a => a.Id == roundId);
+        }
+
+        public void RemoveElectionFromRound(Guid roundId, Guid playerId)
+        {
+            var entities = ValidateIds(roundId, playerId);
+
+            _ledgerService.PurchaseCredits(playerId, 1);
+            entities.Item1.EntrantPlayerIds.Remove(playerId);
             UpdateEntity(entities.Item1, a => a.Id == roundId);
         }
 

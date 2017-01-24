@@ -30,6 +30,7 @@ namespace BallInChair
             var autocompleteActions = new List<CliActionBase>
             {
                 new AddPlayerAction(playerService),
+                new RemovePlayerFromRoundAction(playerService, roundService, ledgerService),
                 new CashOutPlayerAction(playerService, ledgerService),
                 new CreditPlayerAction(playerService, ledgerService),
                 new ViewPlayerAction(playerService, ledgerService, roundService),
