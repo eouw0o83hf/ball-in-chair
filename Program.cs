@@ -38,6 +38,7 @@ namespace BallInChair
                 new ListRoundsAction(roundService),
                 new ViewRoundAction(roundService, playerService),
                 new ListPlayersAction(playerService, ledgerService),
+                new ListPositivePlayersAction(playerService, ledgerService),
                 new ExitAction(exit),
                 new StartRoundAction(roundService),
                 new AddPlayerToRoundAction(playerService, roundService, ledgerService),
